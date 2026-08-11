@@ -40,8 +40,8 @@ lidar_topic: "/livox/lidar"
 #   pip3 install rosbags
 #   rosbags-convert --src mid.bag --dst mid_ros2
 # launch 会把 $(find fast_calib) 替换为包 share 路径
-bag_path: "$(find fast_calib)/calib_data/avia/mid_ros2"
-image_path: "$(find fast_calib)/calib_data/avia/mid.bmp"
+bag_path: "calib_data/bag/mid.bag"
+image_path: "calib_data/image/mid.bmp"
 
 # Output
-output_path: "$(find fast_calib)/output"
+output_path: "output"
