@@ -22,7 +22,7 @@ which is included as part of this source code package.
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
 
-#include <fast_calib/msg/custom_msg.hpp>
+// #include <fast_calib/msg/custom_msg.hpp>
 
 #include <fstream>
 #include <filesystem>
@@ -43,11 +43,11 @@ enum class LiDARType : int {
 
 namespace fast_calib_bag
 {
-// 判断消息类型是否为 Livox CustomMsg（兼容 driver / driver2 / 本包）
-inline bool isLivoxCustomMsgType(const std::string &type)
-{
-    return type.find("CustomMsg") != std::string::npos;
-}
+// // 判断消息类型是否为 Livox CustomMsg（兼容 driver / driver2 / 本包）
+// inline bool isLivoxCustomMsgType(const std::string &type)
+// {
+//     return type.find("CustomMsg") != std::string::npos;
+// }
 
 inline bool isPointCloud2Type(const std::string &type)
 {
@@ -70,24 +70,24 @@ inline bool topicMatches(const std::string &bag_topic, const std::string &wanted
     return a == b || a == ("/" + b) || ("/" + a) == b;
 }
 
-inline void appendLivoxCustomMsg(const fast_calib::msg::CustomMsg &livox_custom_msg,
-                          std::uint32_t current_scan_id,
-                          pcl::PointCloud<Common::Point>::Ptr cloud_input)
-{
-    cloud_input->reserve(cloud_input->size() + livox_custom_msg.point_num);
-    for (uint32_t i = 0; i < livox_custom_msg.point_num; ++i)
-    {
-        Common::Point p;
-        p.x = livox_custom_msg.points[i].x;
-        p.y = livox_custom_msg.points[i].y;
-        p.z = livox_custom_msg.points[i].z;
-        p.intensity = static_cast<float>(livox_custom_msg.points[i].reflectivity);
-        // Livox CustomPoint 的 line 字段表示线号
-        p.ring = static_cast<std::uint16_t>(livox_custom_msg.points[i].line);
-        p.scan_id = current_scan_id;
-        cloud_input->push_back(p);
-    }
-}
+// inline void appendLivoxCustomMsg(const fast_calib::msg::CustomMsg &livox_custom_msg,
+//                           std::uint32_t current_scan_id,
+//                           pcl::PointCloud<Common::Point>::Ptr cloud_input)
+// {
+//     cloud_input->reserve(cloud_input->size() + livox_custom_msg.point_num);
+//     for (uint32_t i = 0; i < livox_custom_msg.point_num; ++i)
+//     {
+//         Common::Point p;
+//         p.x = livox_custom_msg.points[i].x;
+//         p.y = livox_custom_msg.points[i].y;
+//         p.z = livox_custom_msg.points[i].z;
+//         p.intensity = static_cast<float>(livox_custom_msg.points[i].reflectivity);
+//         // Livox CustomPoint 的 line 字段表示线号
+//         p.ring = static_cast<std::uint16_t>(livox_custom_msg.points[i].line);
+//         p.scan_id = current_scan_id;
+//         cloud_input->push_back(p);
+//     }
+// }
 
 inline void appendPointCloud2(const sensor_msgs::msg::PointCloud2 &pcl_msg,
                        std::uint32_t current_scan_id,
@@ -235,7 +235,7 @@ public:
             topic_types[topic_meta.name] = topic_meta.type;
         }
 
-        rclcpp::Serialization<fast_calib::msg::CustomMsg> livox_serialization;
+        // rclcpp::Serialization<fast_calib::msg::CustomMsg> livox_serialization;
         rclcpp::Serialization<sensor_msgs::msg::PointCloud2> cloud_serialization;
         std::uint32_t scan_id = 0;
 
@@ -256,20 +256,20 @@ public:
 
             rclcpp::SerializedMessage serialized_msg(*bag_message->serialized_data);
 
-            if (fast_calib_bag::isLivoxCustomMsgType(msg_type))
-            {
-                fast_calib::msg::CustomMsg livox_custom_msg;
-                try {
-                    livox_serialization.deserialize_message(&serialized_msg, &livox_custom_msg);
-                } catch (const std::exception &e) {
-                    ROS_WARN_STREAM("Failed to deserialize CustomMsg: " << e.what());
-                    continue;
-                }
-                const std::uint32_t current_scan_id = scan_id++;
-                lidar_type_ = LiDARType::Solid;
-                fast_calib_bag::appendLivoxCustomMsg(livox_custom_msg, current_scan_id, cloud_input_);
-                continue;
-            }
+            // if (fast_calib_bag::isLivoxCustomMsgType(msg_type))
+            // {
+            //     fast_calib::msg::CustomMsg livox_custom_msg;
+            //     try {
+            //         livox_serialization.deserialize_message(&serialized_msg, &livox_custom_msg);
+            //     } catch (const std::exception &e) {
+            //         ROS_WARN_STREAM("Failed to deserialize CustomMsg: " << e.what());
+            //         continue;
+            //     }
+            //     const std::uint32_t current_scan_id = scan_id++;
+            //     lidar_type_ = LiDARType::Solid;
+            //     fast_calib_bag::appendLivoxCustomMsg(livox_custom_msg, current_scan_id, cloud_input_);
+            //     continue;
+            // }
 
             if (fast_calib_bag::isPointCloud2Type(msg_type))
             {

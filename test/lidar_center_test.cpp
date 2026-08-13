@@ -27,7 +27,7 @@ Standalone LiDAR-only batch test entry for target annulus center extraction.
 #include <rosbag2_storage/storage_options.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
-#include <fast_calib/msg/custom_msg.hpp>
+// #include <fast_calib/msg/custom_msg.hpp>
 #include <sys/stat.h>
 #include <unordered_map>
 
@@ -93,7 +93,7 @@ bool loadCloudFromBag(const std::string& bag_path,
         topic_types[topic_meta.name] = topic_meta.type;
     }
 
-    rclcpp::Serialization<fast_calib::msg::CustomMsg> livox_serialization;
+    // rclcpp::Serialization<fast_calib::msg::CustomMsg> livox_serialization;
     rclcpp::Serialization<sensor_msgs::msg::PointCloud2> cloud_serialization;
     size_t message_count = 0;
 
@@ -114,32 +114,32 @@ bool loadCloudFromBag(const std::string& bag_path,
         rclcpp::SerializedMessage serialized_msg(*bag_message->serialized_data);
         const std::string& msg_type = type_it->second;
 
-        if (fast_calib_bag::isLivoxCustomMsgType(msg_type))
-        {
-            fast_calib::msg::CustomMsg livox_custom_msg;
-            try {
-                livox_serialization.deserialize_message(&serialized_msg, &livox_custom_msg);
-            } catch (const std::exception& e) {
-                ROS_WARN_STREAM("[LiDAR Test] Failed to deserialize CustomMsg: " << e.what());
-                continue;
-            }
+        // if (fast_calib_bag::isLivoxCustomMsgType(msg_type))
+        // {
+        //     fast_calib::msg::CustomMsg livox_custom_msg;
+        //     try {
+        //         livox_serialization.deserialize_message(&serialized_msg, &livox_custom_msg);
+        //     } catch (const std::exception& e) {
+        //         ROS_WARN_STREAM("[LiDAR Test] Failed to deserialize CustomMsg: " << e.what());
+        //         continue;
+        //     }
 
-            detected_type = LiDARType::Solid;
-            cloud->reserve(cloud->size() + livox_custom_msg.point_num);
-            for (uint32_t i = 0; i < livox_custom_msg.point_num; ++i)
-            {
-                Common::Point p;
-                p.x = livox_custom_msg.points[i].x;
-                p.y = livox_custom_msg.points[i].y;
-                p.z = livox_custom_msg.points[i].z;
-                p.intensity = static_cast<float>(livox_custom_msg.points[i].reflectivity);
-                p.ring = static_cast<std::uint16_t>(livox_custom_msg.points[i].line);
-                p.scan_id = static_cast<std::uint32_t>(message_count);
-                cloud->push_back(p);
-            }
-            ++message_count;
-            continue;
-        }
+        //     detected_type = LiDARType::Solid;
+        //     cloud->reserve(cloud->size() + livox_custom_msg.point_num);
+        //     for (uint32_t i = 0; i < livox_custom_msg.point_num; ++i)
+        //     {
+        //         Common::Point p;
+        //         p.x = livox_custom_msg.points[i].x;
+        //         p.y = livox_custom_msg.points[i].y;
+        //         p.z = livox_custom_msg.points[i].z;
+        //         p.intensity = static_cast<float>(livox_custom_msg.points[i].reflectivity);
+        //         p.ring = static_cast<std::uint16_t>(livox_custom_msg.points[i].line);
+        //         p.scan_id = static_cast<std::uint32_t>(message_count);
+        //         cloud->push_back(p);
+        //     }
+        //     ++message_count;
+        //     continue;
+        // }
 
         if (fast_calib_bag::isPointCloud2Type(msg_type))
         {

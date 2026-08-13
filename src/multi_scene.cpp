@@ -177,22 +177,57 @@ int main(int argc, char** argv)
     }
 
     // 取最后3个 block
+    // std::vector<Eigen::Vector3d> L, C;
+    // for (size_t k = blocks.size() - 3; k < blocks.size(); ++k) 
+    // {
+    //     const auto& b = blocks[k];
+    //     // 依次拼入，保持顺序一致
+    //     for (int i = 0; i < 4; ++i) 
+    //     {
+    //         L.push_back(b.lidar_pts[i]);
+    //         C.push_back(b.qr_pts[i]);
+    //     }
+    // }
+    // if (L.size() != 12 || C.size() != 12) {
+    //     ROS_ERROR("Merged pairs not equal to 12 (L=%zu, C=%zu).", L.size(), C.size());
+    //     rclcpp::shutdown();
+    //     return 1;
+    // }
+
+
+    // 使用全部有效场景
     std::vector<Eigen::Vector3d> L, C;
-    for (size_t k = blocks.size() - 3; k < blocks.size(); ++k) 
+
+    for (size_t k = 0; k < blocks.size(); ++k)
     {
         const auto& b = blocks[k];
-        // 依次拼入，保持顺序一致
-        for (int i = 0; i < 4; ++i) 
+
+        for (int i = 0; i < 4; ++i)
         {
             L.push_back(b.lidar_pts[i]);
             C.push_back(b.qr_pts[i]);
         }
     }
-    if (L.size() != 12 || C.size() != 12) {
-        ROS_ERROR("Merged pairs not equal to 12 (L=%zu, C=%zu).", L.size(), C.size());
+
+    const size_t expected_points = blocks.size() * 4;
+
+    if (L.size() != expected_points || C.size() != expected_points)
+    {
+        ROS_ERROR(
+            "Merged pairs mismatch: scenes=%zu, expected=%zu, L=%zu, C=%zu.",
+            blocks.size(),
+            expected_points,
+            L.size(),
+            C.size());
+
         rclcpp::shutdown();
         return 1;
     }
+
+    ROS_INFO(
+        "Using %zu calibration scenes, %zu point pairs.",
+        blocks.size(),
+        L.size());
 
     std::cout << "LiDAR centers:" << std::endl;
     for (size_t i = 0; i < L.size(); ++i) {

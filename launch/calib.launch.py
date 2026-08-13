@@ -68,7 +68,6 @@ def _launch_setup(context, *args, **kwargs):
                 package='rviz2',
                 executable='rviz2',
                 name='rviz',
-                arguments=['-d', rviz_cfg],
                 output='screen',
             )
         )
@@ -77,7 +76,7 @@ def _launch_setup(context, *args, **kwargs):
 
 def generate_launch_description():
     return LaunchDescription([
-        DeclareLaunchArgument('rviz', default_value='true'),
+        DeclareLaunchArgument('rviz', default_value='false'),
         DeclareLaunchArgument('config_file', default_value=''),
         DeclareLaunchArgument('bag_path', default_value=''),
         DeclareLaunchArgument('image_path', default_value=''),
