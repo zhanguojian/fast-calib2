@@ -4,9 +4,6 @@ ros2
 =======
 # FAST-Calib2
 
-## LiDAR-Camera Extrinsic Calibration with Reflective Annular Targets
-
-FAST-Calib2 extends [FAST-Calib](https://github.com/hku-mars/FAST-Calib) to LiDAR-camera modules that were previously hard to calibrate due to **low-quality point clouds**. With a custom-designed reflective annular calibration target, it enables robust center extraction on **large-spot solid-state and mechanical LiDARs**, including Mid360, Avia, Ouster, XT32, JT128, Airy, E1R, and Adaps Photonics Spad LiDAR.
 
 **Key highlights include:**
 
@@ -16,24 +13,14 @@ FAST-Calib2 extends [FAST-Calib](https://github.com/hku-mars/FAST-Calib) to LiDA
 4. Geometry and radius quality checks for extracted annulus centers.
 5. Single-scene and multi-scene LiDAR-camera extrinsic calibration without initial extrinsic parameters.
 
-📬 For further assistance or inquiries, please feel free to contact Chunran Zheng at zhengcr@connect.hku.hk.
-
-<p align="center">
-  <img src="./pics/cover.jpg" width="100%">
-  <font color=#a0a0a0 size=2>Mid360 calibration example.</font>
-</p>
 
 ## 1. Prerequisites
 
 - ROS 2 Humble (or compatible)
 - PCL >= 1.8, OpenCV >= 4.0
-- `rosbag2`（本包通过 rosbag2 读取点云；若数据仍是 ROS1 `.bag`，需先转换）
 
-```bash
-# 可选：转换 ROS1 bag 为 rosbag2
-pip3 install rosbags
-rosbags-convert --src calib_data/avia/mid.bag --dst calib_data/avia/mid_ros2
-```
+
+
 
 Build:
 
@@ -42,7 +29,7 @@ cd <your_ros2_ws>/src
 # 将本仓库放到 src 下
 cd ..
 source /opt/ros/humble/setup.bash
-colcon build --packages-select fast_calib --symlink-install
+colcon build  --symlink-install
 source install/setup.bash
 ```
 
@@ -52,26 +39,16 @@ source install/setup.bash
 
 ### 1. 准备标定数据
 
-从 [Google Drive](https://drive.google.com/drive/folders/1VnMCsGj3Gat7dxe6IION0SfS7jYNMw1g?usp=sharing) 下载示例数据，或自行采集静态数据，需要：
 
 | 数据 | 说明 |
 |------|------|
 | 点云 bag | ROS 2 **rosbag2 目录**（含 `metadata.yaml`），topic 为 LiDAR 点云 |
 | 图像 | 与 bag 同一时刻的 `.bmp` / `.png` 等静态图片 |
 
-**ROS 1 `.bag` 需先转换**（本包只支持 rosbag2）：
-
-```bash
-pip3 install rosbags
-rosbags-convert --src calib_data/avia/mid.bag --dst calib_data/avia/mid_ros2
-```
-
-转换完成后，`bag_path` 应指向 **目录** `mid_ros2/`，而不是原来的 `.bag` 文件。
 
 支持的点云消息类型：
 
 - `sensor_msgs/msg/PointCloud2`（机械式 / 通用 LiDAR）
-- Livox `CustomMsg`（本包内置消息定义，兼容 `livox_ros_driver` / `livox_ros_driver2` 字段布局）
 
 ### 2. 配置参数
 
@@ -103,7 +80,7 @@ image_path: "/绝对路径/to/mid.bmp"
 
 # 输出
 output_path: "/绝对路径/to/output"
-use_auto_lidar_roi: true               # 推荐开启，自动提取标定板 ROI
+use_auto_lidar_roi: true               # 不推荐开启，自动提取标定板 ROI
 ```
 
 **LiDAR 安装轴说明**：取值必须为带符号的轴名（如 `+x`、`-y`），且 `forward` 与 `up` 必须互相垂直。左方向由右手系 `forward × left = up` 自动推导。
@@ -147,8 +124,7 @@ Launch 参数：
 
 ```bash
 # 依次运行 3 次单场景标定（修改 bag_path / image_path 或使用 launch 覆盖）
-ros2 launch fast_calib calib.launch.py bag_path:=... image_path:=...
-
+ros2 launch fast_calib calib.launch.py 
 # 至少 3 组数据写入 output/circle_center_record.txt 后：
 ros2 launch fast_calib multi_calib.launch.py
 ```
@@ -223,10 +199,6 @@ Materials:
 - Board: PVC
 - Reflective annulus stickers: 3M engineering-grade reflective film
 
-<p align="center">
-  <img src="./pics/FAST-Calib2-board.png" width="100%">
-  <font color=#a0a0a0 size=2>Reflective annular calibration target and annotated dimensions.</font>
-</p>
 
 DIY Calibration Target Tips:
 
@@ -287,10 +259,6 @@ ros2 launch fast_calib multi_calib.launch.py
 
 Typical multi-scene target placement:
 
-<p align="center">
-  <img src="./pics/multi-scene.jpg" width="100%">
-  <font color=#a0a0a0 size=2>Placement of the calibration target for multi-scene data collection: (a) facing forward, (b) oriented to the right, (c) oriented to the left.</font>
-</p>
 
 ## 5. Standalone LiDAR Center Extraction Test
 
